@@ -3,19 +3,23 @@
 let currentMontCounter = 0;
 let clicked = null;
 let toggledEvent = false;
-let events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+let events = sessionStorage.getItem('events') ? JSON.parse(sessionStorage.getItem('events')) : [];
+let errorMessages = [];
 
 
-
+//getting calendar elements
 const calendar = document.querySelector('.days');
-const detailsView = document.querySelector('.details'); 
+const detailsViewContainer = document.querySelector('.detailsContainer');
 const formView = document.querySelector('.form-vertical')
 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const addEventButton = document.querySelector('.addEventButton');
-const modalSuccess = document.getElementById('modalSuccess');
-const modalFailed = document.getElementById('modalFailed');
 
-clicked !== null ? detailsView.style.display = 'flex': detailsView.style.display = 'none';
+// getting modal elements
+const modal = document.getElementById('deletedModal');
+const exitButton = document.getElementById('closeModal');
+
+
+clicked !== null ? detailsViewContainer.style.display = 'flex' : detailsViewContainer.style.display = 'none';
 
 //Form inputs
 
@@ -28,6 +32,12 @@ const formInputs = {
     description: document.getElementById('description')
 }
 
+// Form error messages
+
+let errorField = document.getElementById('errorMessage');
+console.log('before evaluating message array', errorMessages)
+errorMessages.length > 0 ? errorField.style.display = 'block' : errorField.style.display = 'none';
+console.log('after evaluating message array', errorMessages)
 
 // functions for time calculation
 
@@ -48,33 +58,95 @@ const timeDiff = (start, end) => {
 
 
 const renderDetails = (date) => {
-    
-
     // editing date format to handle date input value changes
 
-    const splitted = date.split('-')
+    const splitted = date.split('-');
     let years = splitted[0];
     let months = splitted[1];
     let days = splitted[2];
 
-    months < 10 ? months ="-0" + months : months = '-' + months;
-    days < 10 ? days = '-0' + days : days = '-' + days;
-    
+    if (date.length < 10) {
+        months < 10 ? months ="-0" + months : months = '-' + months;
+        days < 10 ? days = '-0' + days : days = '-' + days;
+    } else {
+        months = '-' + months;
+        days = '-' + days;
+    }
+
     clicked = years + months + days;
 
     formInputs.date.setAttribute('value', clicked)
 
+    const eventForThisDay = events.filter(event => event.date === clicked)
 
-    const eventForThisDay = events.find(e => e.date === clicked)
-    console.log(eventForThisDay)
 
-    if (eventForThisDay) {
-        detailsView.style.display = 'flex';
+    if (eventForThisDay.length > 0) {
+
+        detailsViewContainer.innerHTML = '';
+        const callAddNewEventForm = document.createElement('button')
+        callAddNewEventForm.className = 'addEventButton';
+        callAddNewEventForm.innerText = 'Add new event';
+        callAddNewEventForm.onclick = () => openFormView()
+        detailsViewContainer.appendChild(callAddNewEventForm)
+
+        eventForThisDay.map( event => {
+
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'details';
+            detailsViewContainer.appendChild(detailsDiv);
+
+            const detailsTitle = document.createElement('h2');
+            detailsTitle.className = 'eventTitle';
+            detailsTitle.innerText = `Your event is - ${event.title}`;
+            detailsDiv.appendChild(detailsTitle);
+
+            const detailsDate = document.createElement('p');
+            detailsDate.className = 'eventDate'
+            detailsDate.innerText = `It starts on : ${event.startDate}`;
+            detailsDiv.appendChild(detailsDate);
+
+            const detailsDuration = document.createElement('p');
+            detailsDuration.className = 'eventDate'
+            detailsDuration.innerText = `It will take about : ${event.duration}`;
+            detailsDiv.appendChild(detailsDuration);
+
+            const detailsType = document.createElement('p');
+            detailsType.className = 'eventDate'
+            detailsType.innerText = `Type of event : ${event.type}`;
+            detailsDiv.appendChild(detailsType);
+
+            if (event.description !== "") {
+                const detailsDescription = document.createElement('p');
+                detailsDescription.className = 'eventDate'
+                detailsDescription.innerText = `Description : ${event.description}`;
+                detailsDiv.appendChild(detailsDescription);
+            }
+
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'buttonsDiv';
+            detailsDiv.appendChild(buttonsDiv)
+
+            const closeEventButton =document.createElement('button');
+            closeEventButton.className = 'close';
+            closeEventButton.innerText = 'Close'
+            closeEventButton.addEventListener('click', () => closeDetailsView());
+            buttonsDiv.appendChild(closeEventButton);
+
+            const deleteEventButton =document.createElement('button');
+            deleteEventButton.className = 'deleteEvent';
+            deleteEventButton.setAttribute('value', `${event.id}`);
+            deleteEventButton.innerText = 'Delete'
+            deleteEventButton.addEventListener('click', (e) => deleteEvent(e));
+            buttonsDiv.appendChild(deleteEventButton);
+        })
+        detailsViewContainer.style.display = 'flex';
         formView.style.display = 'none';
     } else {
-        detailsView.style.display = 'none';
+        detailsViewContainer.style.display = 'none';
         formView.style.display = 'flex';
     }
+    errorMessages.length > 0 ? errorField.style.display = 'block' : errorField.style.display = 'none';
+
 }
 
 
@@ -107,9 +179,11 @@ const load = () => {
 
     calendar.innerHTML = '';
 
+   
+
     for(let i = 0; i < hiddenDays + daysInMonth ; i++) {
         const dayBlock = document.createElement('div');
-        dayBlock.classList.add('day');
+        dayBlock.classList.add('days');
         const blockParagraph = document.createElement('p');
         dayBlock.appendChild(blockParagraph);
 
@@ -125,27 +199,25 @@ const load = () => {
 
         const newDayString = years + months + days;
 
-        console.log('newDayString', newDayString);  // taisyti day string
-
         if ( i > hiddenDays) {
             blockParagraph.innerText = i - hiddenDays;
 
-            const eventForThisDay = events.find(e => e.date === newDayString)
-
-            console.log(events)
+            const eventForThisDay = events.filter(event => event.date === newDayString);
             
             if (i - hiddenDays === day && currentMontCounter === 0) {
                 dayBlock.id = 'today';
             }
 
-            if ( eventForThisDay ) {
+            if ( eventForThisDay.length > 0) {
                 console.log('we have an event for this day')
-                const eventParagraph = document.createElement('p');
-                const eventDiv = document.createElement('div');
-                eventDiv.classList.add('event')
-                eventDiv.appendChild(eventParagraph)
-                eventParagraph.innerText = eventForThisDay.title;
-                dayBlock.appendChild(eventDiv)
+                const eventUl = document.createElement('ul');
+                eventUl.classList.add('event')
+                eventForThisDay.map(event => {
+                    const eventLi = document.createElement('li');
+                    eventUl.appendChild(eventLi)
+                    eventLi.innerText = event.title;
+                })
+                dayBlock.appendChild(eventUl)
             }
             dayBlock.addEventListener('click', (e) => renderDetails(dayString))
         } else {
@@ -158,12 +230,18 @@ const load = () => {
 
 // event handling functions
 
-const deleteEvent = () => {
-    events = events.filter(event => event.date !== clicked);
-    localStorage.setItem('events', JSON.stringify(events));
-    detailsView.style.display = 'none';
+const deleteEvent = (e) => {
+
+   events = events.filter(event =>  e.target.value != event.id);
+   sessionStorage.setItem('events', JSON.stringify(events));
     load();
-    
+    renderDetails(date.value);
+    openModal();
+}
+
+const openFormView = () => {
+    formView.style.display = 'flex';
+    detailsViewContainer.style.display = 'none';
 }
 
 const closeFormView = () => {
@@ -172,12 +250,17 @@ const closeFormView = () => {
 }
 
 const closeDetailsView = () => {
-    detailsView.style.display = 'none';
+    detailsViewContainer.style.display = 'none';
     clicked = null;
 }
 
+
+
 const submitEvent = (e) => {
     e.preventDefault();
+
+    errorField.innerHTML = '';
+    
     if (
         formInputs.title.value !== '' &&
         formInputs.date.value !== '' &&
@@ -189,28 +272,68 @@ const submitEvent = (e) => {
         date: formInputs.date.value,
         duration: timeDiff(formInputs.startTime.value, formInputs.endTime.value ),
         type: formInputs.type.value,
-        description: formInputs.description.value
+        description: formInputs.description.value, 
+        id: Math.floor(Math.random() * 10000)
             }) 
-
-        localStorage.setItem('events', JSON.stringify(events));
-        setTimeout(() => {modalSuccess.classList.add('show')}, 2000)
-        setTimeout(() => {modalSuccess.classList.remove('show')}, 2000)
-    } else {
-        modalFailed.classList.add('show');
-    } 
+        sessionStorage.setItem('events', JSON.stringify(events));
+     
   
     formInputs.title.value = '';
-    formInputs.date.value = '';
+    formInputs.date.setAttribute('value', clicked);
     formInputs.startTime.value = '';
     formInputs.endTime.value = '';
     formInputs.type.value = '';
     formInputs.description.value = '';
 
-    load();
-    renderDetails();
+    errorMessages = [];
+    } else  {
+        errorMessages = [];
+        if (formInputs.title.value === ''){
+            errorMessages.push('Title is required!');
+        }
+        if (formInputs.date.value === '') {
+            errorMessages.push('Date is required!');
+        }
+        if (formInputs.startTime.value === '') {
+            errorMessages.push('Start event time is required!');
+        }
+        if (formInputs.endTime.value === '') {
+            errorMessages.push('End event time is required!');
+        }
+        if (formInputs.type.value === '') {
+            errorMessages.push('Type of event is required! ');
+        }
+        if (errorMessages.length > 0) {
+            
+            errorMessages.map(message => {
+            let liElement = document.createElement('li');
+            errorField.appendChild(liElement);
+            liElement.innerText = message;
+        } )
+        }
+
+       
+}
+errorMessages.length > 0 ? errorField.style.display = 'block' : errorField.style.display = 'none';
+
+load();
+renderDetails(date.value);
+}
+
+// functions for modal
+
+
+const openModal = () => {
+    modal.style.display = 'block';
+    setTimeout(closeModal, 6000);
+}
+
+const closeModal = () => {``
+    modal.style.display = 'none';
 }
 
 
+// Event listeners
 
 const eventListeners = () => {
 
@@ -226,8 +349,8 @@ const eventListeners = () => {
 
     document.querySelector('.cancel').addEventListener('click', () => closeFormView());
     document.querySelector('.addEventButton').addEventListener('click', (e) => submitEvent(e));
-    document.querySelector('.close').addEventListener('click', () => closeDetailsView());
-    document.querySelector('.deleteEvent').addEventListener('click', () => deleteEvent());
+    
+    document.getElementById('closeModal').addEventListener('click', () => closeModal());
 }
 
 eventListeners();

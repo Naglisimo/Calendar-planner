@@ -47,21 +47,31 @@
 
 
         <div class="details-form">
+         
             <form class='form-vertical'>
+
                 <label for="title">Title</label>
                 <input type="text" id='title' required></input>
                 <label for="date">Date</label>
                 <input type="date" id='date' required></input>
-                <label for="startDate">Start Date</label>
-                <input type="time" id='startTime' required></input>
-                <label for="endDate">End Date</label>
-                <input type="time" id='endTime' required></input>
-                <label for="type">Type</label>
-                <select id='type' required>
-                    <option value="Meeting">Meeting</option>
-                    <option value="Call">Call</option>
-                    <option value="Out of office">Out of office</option>
-                </select>
+                    <div class="inline">
+                        <div>
+                            <label for="startDate">Start Date</label>
+                            <input type="time" id='startTime' required></input>
+                        </div>
+                        <div>
+                            <label for="endDate">End Date</label>
+                            <input type="time" id='endTime' required></input>
+                        </div>
+                        <div>
+                            <label for="type">Type</label>
+                            <select id='type' required>
+                                <option value="Meeting">Meeting</option>
+                                <option value="Call">Call</option>
+                                <option value="Out of office">Out of office</option>
+                            </select>
+                        </div>
+                    </div>
                 <label for="type">Description</label>
                 <input type='text' id='description'></input>
                 <span>
@@ -70,21 +80,22 @@
                 </span>
 
             </form>
-
-            <div class='details'>
-                <h2>Your event is - </h2> <h2 class='eventTitle'></h2>
-                <div> <p>It starts on - </p><p class='eventDate'></p><p>, and starts at</p><p class="eventStartTime"></p></div>
-                <div> <p>It will take about -</p><p class='eventDuration'></p></div>
-                <div> <p>Type of event is - </p><p class='eventType'></p></div>
-                <div> <p></p><p class='eventDescription'></p></div>
-                <div> <button class='close'> Close </button>
-                    <button class='deleteEvent'>delete</button></div>
-            </div>
-
-
+            <ul id='errorMessage'></ul>
+            <div class="detailsContainer"></div>
         </div>
 
     </div>
+
+    <div id="deletedModal" class='modal'>
+        <div class='modal-content'>            
+            <span id='closeModal'>&times;</span>
+        <div>
+            <i class="fa-solid fa-calendar-check"></i></h1> Event has been deleted!</h1>
+        </div>
+
+        </div>
+    </div>
+
 
     <script src="./JavaScript.js"></script>
 </body>
