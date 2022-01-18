@@ -97,7 +97,7 @@ max-width: 1000px;
     height: 10px;
     padding-bottom: 3rem;
     padding-right: 2rem;
-    
+    right: 2rem;
 }
 
 .days div:hover:not(.today) {
@@ -109,13 +109,18 @@ max-width: 1000px;
     background-color: #517664;
 }
 
-.event p {
+.event {
+    margin: 24px 0 0 8px;
+}
+
+.event li {
     font-size: 0.8rem;
     width: 100px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     margin: 0;
+
 }
 
 /* Right side   */
@@ -137,21 +142,31 @@ max-width: 1000px;
 .form-vertical {
     visibility: visible; 
     padding-top: 12rem;
+    min-width: 450px;
+    max-width: 500px;
 }
 
 .form-vertical label, button{
-margin: 1rem 1rem 0 0;
+    font-weight: 500;
+margin: 0.8rem 0.8rem 0 0;
 font-size: 1.3rem;
-
-padding-bottom: 0.2rem;
-
 }
 
 .form-vertical input, select {
-    padding-top: 1rem;
-    font-size: 1rem;
-    text-align: center;
-    font-weight: 400;
+    font-size: 0.8rem;                                                                                                            
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.inline {
+    margin-top: 8px;
+    width: 500px;
+    display: flex;
+    justify-content: center;
 }
 
 button {
@@ -162,22 +177,58 @@ button {
     padding-top: -1rem;
     border-radius: 0.8rem;
     font-weight: 400;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+button:hover {
+    opacity: 0.9;
 }
 
 .addEventButton {
-    background-color:#B0E8B4;
+    background-color:#b0e8b4f5;
 }
 
 .cancel {
     background-color: #F6C9A2;
 }
+
+#errorMessage {
+    display: none;
+    width: 300px;
+    height: auto;
+    padding: 1rem;
+    background-color: #F6C9A2;
+    position: relative;
+    color: rgb(253, 118, 40);
+    margin: 1rem;
+    font-size: 1.3rem;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    box-shadow: 0.5rem 0.5rem 0.2rem 0.2rem rgba(0, 0, 0, 0.1);
+}
+
+#errorMessage li {
+    margin-left: 2rem;
+}
  
 
 /* details  */
 
+.detailsContainer {
+    margin-top: 12rem;
+    margin-right: 2rem;
+    min-height: 40rem;
+    max-height: 80vh;
+    width: 30rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
 .details {
-    margin-top: 14rem;
-    margin-right: 5rem;
+    margin-top: 2rem;
     padding: 2rem;
     display: flex;
     flex-flow: column;
@@ -203,3 +254,44 @@ button {
     background-color: #D96D9C;
 }
 
+/* Modal */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #f4f4f4;
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 20% auto;
+    padding: 20px;
+    width: 350px;
+    height: auto;
+    box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.fa-solid  {
+    color: green;
+}
+
+#closeModal {
+    color: #ccc;
+    float: right;
+}
+
+
+#closeModal:hover,.closeModal:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
