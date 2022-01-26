@@ -7,15 +7,20 @@
 }
 
 .layout {
+    overflow: hidden;
+    position: relative;
     display: flex;
+    height: auto;
+    background: linear-gradient(to bottom left, #82204A, #558C8C);
 }
 
 /* Left side, calendar view container */
 
 .calendar-view-container {
     width: 66vw;
-    height: 100vh;
-    background: linear-gradient(to bottom right, #82204A, #558C8C)
+    height: 100%;
+    background: linear-gradient(to bottom right, #82204A, #558C8C);
+    padding-bottom: 3rem;
 }
 
 .month {
@@ -53,7 +58,8 @@
     height: 5rem;
     margin: 0 auto;
     display: grid;
-    grid-template-columns:  repeat(7, minmax(auto, 150px));
+    grid-template-columns:  repeat(7,  130px);
+    justify-content: center;
     align-items: center;
 }
 
@@ -72,7 +78,7 @@
 display: grid;
 justify-content: center;
 margin: 0 auto;
-grid-template-columns:  repeat(7, minmax(auto, 150px));
+grid-template-columns:  repeat(7, 130px);
 max-width: 1000px;
 }
 
@@ -126,9 +132,11 @@ max-width: 1000px;
 /* Right side   */
 
 .details-form {
+    position: relative;
     width: 34vw;
     height: 100vh;
     background: linear-gradient(to bottom left, #82204A, #558C8C);
+    padding-bottom: 8.5rem;
 }
 
 /* for detail view and form */
