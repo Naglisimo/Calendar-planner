@@ -35,9 +35,7 @@ const formInputs = {
 // Form error messages
 
 let errorField = document.getElementById('errorMessage');
-console.log('before evaluating message array', errorMessages)
 errorMessages.length > 0 ? errorField.style.display = 'block' : errorField.style.display = 'none';
-console.log('after evaluating message array', errorMessages)
 
 // functions for time calculation
 
@@ -49,24 +47,20 @@ const timeDiff = (start, end) => {
     let diff = endDate.getTime() - startDate.getTime();
     let hours = Math.floor(diff / 1000 / 60 / 60);
     diff -= hours * 1000 * 60 * 60;
-    let minutes = Math.floor(diff / 1000 / 60);
-
+    let minutes = Math.floor(diff / 1000 / 60)
     return (hours <= 9 ? "0" : "") + hours + ":" + (minutes <= 9 ? "0" : "") + minutes;
 }
 
 
-
-
 const renderDetails = (date) => {
     // editing date format to handle date input value changes
-
     const splitted = date.split('-');
     let years = splitted[0];
     let months = splitted[1];
     let days = splitted[2];
 
     if (date.length < 10) {
-        months < 10 ? months ="-0" + months : months = '-' + months;
+        months < 10 ? months = "-0" + months : months = '-' + months;
         days < 10 ? days = '-0' + days : days = '-' + days;
     } else {
         months = '-' + months;
@@ -74,11 +68,9 @@ const renderDetails = (date) => {
     }
 
     clicked = years + months + days;
-
     formInputs.date.setAttribute('value', clicked)
 
     const eventForThisDay = events.filter(event => event.date === clicked)
-
 
     if (eventForThisDay.length > 0) {
 
@@ -89,7 +81,7 @@ const renderDetails = (date) => {
         callAddNewEventForm.onclick = () => openFormView()
         detailsViewContainer.appendChild(callAddNewEventForm)
 
-        eventForThisDay.map( event => {
+        eventForThisDay.map(event => {
 
             const detailsDiv = document.createElement('div');
             detailsDiv.className = 'details';
@@ -126,13 +118,13 @@ const renderDetails = (date) => {
             buttonsDiv.className = 'buttonsDiv';
             detailsDiv.appendChild(buttonsDiv)
 
-            const closeEventButton =document.createElement('button');
+            const closeEventButton = document.createElement('button');
             closeEventButton.className = 'close';
             closeEventButton.innerText = 'Close'
             closeEventButton.addEventListener('click', () => closeDetailsView());
             buttonsDiv.appendChild(closeEventButton);
 
-            const deleteEventButton =document.createElement('button');
+            const deleteEventButton = document.createElement('button');
             deleteEventButton.className = 'deleteEvent';
             deleteEventButton.setAttribute('value', `${event.id}`);
             deleteEventButton.innerText = 'Delete'
@@ -157,7 +149,7 @@ const load = () => {
 
     if (currentMontCounter !== 0) {
         date.setMonth(new Date().getMonth() + currentMontCounter);
-    } 
+    }
 
     const day = date.getDate();
     const month = date.getMonth();
@@ -166,24 +158,22 @@ const load = () => {
     const firsDayOfMonth = new Date(year, month, 1);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    const dateString = firsDayOfMonth.toLocaleDateString('en-us', { 
+    const dateString = firsDayOfMonth.toLocaleDateString('en-us', {
         weekday: 'long',
         year: 'numeric',
         month: 'numeric',
         day: 'numeric'
     });
 
-    document.querySelector('.date h1').innerHTML = `${date.toLocaleDateString('en-us', {month: 'long'})} ${year}`
+    document.querySelector('.date h1').innerHTML = `${date.toLocaleDateString('en-us', { month: 'long' })} ${year}`
 
     const hiddenDays = weekDays.indexOf(dateString.split(', ')[0]) - 1
 
     calendar.innerHTML = '';
 
-   
-
-    for(let i = 0; i < hiddenDays + daysInMonth ; i++) {
+    for (let i = 0; i < hiddenDays + daysInMonth; i++) {
         const dayBlock = document.createElement('div');
-        dayBlock.classList.add('days');
+        dayBlock.classList.add('day');
         const blockParagraph = document.createElement('p');
         dayBlock.appendChild(blockParagraph);
 
@@ -193,22 +183,21 @@ const load = () => {
         let years = splitted[0];
         let months = splitted[1];
         let days = splitted[2];
-    
-        months < 10 ? months ="-0" + months : months = '-' + months;
+
+        months < 10 ? months = "-0" + months : months = '-' + months;
         days < 10 ? days = '-0' + days : days = '-' + days;
 
         const newDayString = years + months + days;
 
-        if ( i > hiddenDays) {
+        if (i > hiddenDays) {
             blockParagraph.innerText = i - hiddenDays;
-
             const eventForThisDay = events.filter(event => event.date === newDayString);
-            
+
             if (i - hiddenDays === day && currentMontCounter === 0) {
                 dayBlock.id = 'today';
             }
-
-            if ( eventForThisDay.length > 0) {
+            if (eventForThisDay.length) {
+                console.log('new day string', newDayString);
                 console.log('we have an event for this day')
                 const eventUl = document.createElement('ul');
                 eventUl.classList.add('event')
@@ -219,9 +208,9 @@ const load = () => {
                 })
                 dayBlock.appendChild(eventUl)
             }
-            dayBlock.addEventListener('click', (e) => renderDetails(dayString))
+            dayBlock.addEventListener('click', () => renderDetails(dayString))
         } else {
-            dayBlock.classList.add('hidden') 
+            dayBlock.classList.add('hidden')
         }
         calendar.appendChild(dayBlock);
     }
@@ -232,8 +221,8 @@ const load = () => {
 
 const deleteEvent = (e) => {
 
-   events = events.filter(event =>  e.target.value != event.id);
-   sessionStorage.setItem('events', JSON.stringify(events));
+    events = events.filter(event => e.target.value != event.id);
+    sessionStorage.setItem('events', JSON.stringify(events));
     load();
     renderDetails(date.value);
     openModal();
@@ -260,35 +249,36 @@ const submitEvent = (e) => {
     e.preventDefault();
 
     errorField.innerHTML = '';
-    
+
     if (
         formInputs.title.value !== '' &&
         formInputs.date.value !== '' &&
         formInputs.startTime.value !== '' &&
         formInputs.endTime.value !== '' &&
         formInputs.type.value !== ''
-    ) { events.push({
-        title: formInputs.title.value,
-        date: formInputs.date.value,
-        duration: timeDiff(formInputs.startTime.value, formInputs.endTime.value ),
-        type: formInputs.type.value,
-        description: formInputs.description.value, 
-        id: Math.floor(Math.random() * 10000)
-            }) 
+    ) {
+        events.push({
+            title: formInputs.title.value,
+            date: formInputs.date.value,
+            duration: timeDiff(formInputs.startTime.value, formInputs.endTime.value),
+            type: formInputs.type.value,
+            description: formInputs.description.value,
+            id: Math.floor(Math.random() * 10000)
+        })
         sessionStorage.setItem('events', JSON.stringify(events));
-     
-  
-    formInputs.title.value = '';
-    formInputs.date.setAttribute('value', clicked);
-    formInputs.startTime.value = '';
-    formInputs.endTime.value = '';
-    formInputs.type.value = '';
-    formInputs.description.value = '';
 
-    errorMessages = [];
-    } else  {
+
+        formInputs.title.value = '';
+        formInputs.date.setAttribute('value', clicked);
+        formInputs.startTime.value = '';
+        formInputs.endTime.value = '';
+        formInputs.type.value = '';
+        formInputs.description.value = '';
+
         errorMessages = [];
-        if (formInputs.title.value === ''){
+    } else {
+        errorMessages = [];
+        if (formInputs.title.value === '') {
             errorMessages.push('Title is required!');
         }
         if (formInputs.date.value === '') {
@@ -304,34 +294,31 @@ const submitEvent = (e) => {
             errorMessages.push('Type of event is required! ');
         }
         if (errorMessages.length > 0) {
-            
+
             errorMessages.map(message => {
-            let liElement = document.createElement('li');
-            errorField.appendChild(liElement);
-            liElement.innerText = message;
-        } )
+                let liElement = document.createElement('li');
+                errorField.appendChild(liElement);
+                liElement.innerText = message;
+            })
         }
+    }
+    errorMessages.length > 0 ? errorField.style.display = 'block' : errorField.style.display = 'none';
 
-       
-}
-errorMessages.length > 0 ? errorField.style.display = 'block' : errorField.style.display = 'none';
-
-load();
-renderDetails(date.value);
+    load();
+    renderDetails(date.value);
 }
 
 // functions for modal
-
 
 const openModal = () => {
     modal.style.display = 'block';
     setTimeout(closeModal, 6000);
 }
 
-const closeModal = () => {``
+const closeModal = () => {
+    ``
     modal.style.display = 'none';
 }
-
 
 // Event listeners
 
@@ -349,7 +336,7 @@ const eventListeners = () => {
 
     document.querySelector('.cancel').addEventListener('click', () => closeFormView());
     document.querySelector('.addEventButton').addEventListener('click', (e) => submitEvent(e));
-    
+
     document.getElementById('closeModal').addEventListener('click', () => closeModal());
 }
 
